@@ -37,6 +37,39 @@ class TestDerpibooru(unittest.TestCase):
         
         self.assertIn("creamac", tag.implied_by_tags)
     
+    def test_filter(self) -> None:
+        filter = self.derpibooru.get_filter(100073)
+        
+        self.assertIn(26707, filter.hidden_tag_ids)
+        self.assertIn(43502, filter.spoilered_tag_ids)
+        
+        self.assertEqual("Default", filter.name)
+        self.assertEqual(100073, filter.id)
+        
+        self.assertFalse(filter.public)
+        self.assertTrue(filter.system)
+        self.assertIsNone(filter.user_id)
+    
+    def test_search_images(self) -> None:
+        imgs = self.derpibooru.search_images("rd, fs, -ts, aspect_ratio.gt:1", per_page=50)
+        
+        for i in range(100):
+            img = next(imgs)
+            self.assertIn("rainbow dash", img.tags)
+            self.assertIn("fluttershy", img.tags)
+            self.assertNotIn("twilight sparkle", img.tags)
+            self.assertGreater(img.aspect_ratio, 1)
+            self.assertGreater(img.width, img.height)
+    
+    def test_search_tags(self) -> None:
+        tags = self.derpibooru.search_tags("namespace:oc", per_page=50)
+        
+        for i in range(100):
+            tag = next(tags)
+            self.assertEqual("oc", tag.namespace)
+            self.assertTrue(tag.name.startswith("oc:"))
+            self.assertTrue(tag.slug.startswith("oc-colon-"))
+    
     # TODO: more test cases
     
     def test_tag_conversion(self) -> None:
