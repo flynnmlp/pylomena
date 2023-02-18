@@ -70,6 +70,12 @@ class TestDerpibooru(unittest.TestCase):
             self.assertTrue(tag.name.startswith("oc:"))
             self.assertTrue(tag.slug.startswith("oc-colon-"))
     
+    def test_search_filters(self) -> None:
+        filters = self.derpibooru.search_filters("system:true", per_page=5)
+        
+        for filter in filters:
+            self.assertTrue(filter.system)
+    
     # TODO: more test cases
     
     def test_tag_conversion(self) -> None:

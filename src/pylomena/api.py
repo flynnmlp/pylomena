@@ -168,6 +168,14 @@ class Site:
             params["per_page"] = int(per_page)
         yield from map(Tag, self.api_call_paginated("search/tags", "tags", params=params))
     
+    def search_filters(self, query: str, per_page: Optional[int] = None) -> Iterator[Filter]:
+        "search for filters matching a query. returns an iterable of filters."
+        
+        params: Dict[str, Any] = {"q": query}
+        if per_page:
+            params["per_page"] = int(per_page)
+        yield from map(Filter, self.api_call_paginated("search/filters", "filters", params=params))
+
 
 class PaginatedResult(Iterator[JSONObject]):
     results: List[JSONObject]
