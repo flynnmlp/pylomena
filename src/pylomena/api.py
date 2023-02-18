@@ -3,11 +3,13 @@ import urllib
 import string
 import time
 
-from typing import Any, Dict, List, Iterator, Optional
+from typing import cast, Any, Callable, Dict, Generic, Iterator, List, Optional, TypeVar
 
-from .types import Filter, Image, Tag, JSONObject
+from .types import Filter, Image, Tag, JSONData
 
 __all__ = ["Site"]
+
+T = TypeVar("T")
 
 
 class Site:
@@ -30,14 +32,18 @@ class Site:
         slug: str,
         *args,
         params: Dict[str, Any] = {},
+        t: Optional[Callable] = None,
         **kwargs
-    ) -> Iterator[JSONObject]:
+    ) -> "PaginatedResult[T]":
         """
         get a full list that will be returned in parts
         `slug` is the key in the JSON response that is to be concatenated
         """
         
-        return PaginatedResult(self, method, slug, *args, params=params, **kwargs)
+        if not t:
+            t = cast(Callable[[JSONData], T], lambda x: x)
+        
+        return PaginatedResult(self, method, slug, *args, params=params, t=t, **kwargs)
     
     def get_image(self, image_id: int) -> Image:
         "load details for a given image_id"
@@ -143,7 +149,7 @@ class Site:
         filter_id: Optional[int] = None,
         per_page: Optional[int] = None,
         key: Optional[str] = None
-    ) -> Iterator[Image]:
+    ) -> "PaginatedResult[Image]":
         "search for images matching a query. returns an iterable of images."
         
         params: Dict[str, Any] = {"q": query}
@@ -158,27 +164,27 @@ class Site:
         if key is not None:
             params["key"] = key
         
-        yield from map(Image, self.api_call_paginated("search/images", "images", params=params))
+        return self.api_call_paginated("search/images", "images", params=params, t=Image)
     
-    def search_tags(self, query: str, per_page: Optional[int] = None) -> Iterator[Tag]:
+    def search_tags(self, query: str, per_page: Optional[int] = None) -> "PaginatedResult[Tag]":
         "search for tags matching a query. returns an iterable of tags."
         
         params: Dict[str, Any] = {"q": query}
         if per_page:
             params["per_page"] = int(per_page)
-        yield from map(Tag, self.api_call_paginated("search/tags", "tags", params=params))
+        return self.api_call_paginated("search/tags", "tags", params=params, t=Tag)
     
-    def search_filters(self, query: str, per_page: Optional[int] = None) -> Iterator[Filter]:
+    def search_filters(self, query: str, per_page: Optional[int] = None) -> "PaginatedResult[Filter]":
         "search for filters matching a query. returns an iterable of filters."
         
         params: Dict[str, Any] = {"q": query}
         if per_page:
             params["per_page"] = int(per_page)
-        yield from map(Filter, self.api_call_paginated("search/filters", "filters", params=params))
+        return self.api_call_paginated("search/filters", "filters", params=params, t=Filter)
 
 
-class PaginatedResult(Iterator[JSONObject]):
-    results: List[JSONObject]
+class PaginatedResult(Iterator[T], Generic[T]):
+    results: List[JSONData]
     total: int
     
     def __init__(
@@ -188,12 +194,14 @@ class PaginatedResult(Iterator[JSONObject]):
         slug: str,
         *args,
         params: Dict[str, Any] = {},
+        t: Optional[Callable],
         **kwargs,
     ):
         self.site = site
         self.method = method
         self.slug = slug
         self.params = params
+        self.t = t if t else lambda x: x
         self.args = args
         self.kwargs = kwargs
         
@@ -204,13 +212,14 @@ class PaginatedResult(Iterator[JSONObject]):
     def page(self) -> int:
         return int(self.params.get("page", 1))
     
-    def __next__(self) -> JSONObject:
+    def __next__(self) -> T:
         if not self.results:
             self.fetch_next()
             if not self.results:
                 raise StopIteration
         
-        return self.results.pop(0)
+        t = cast(Callable[[JSONData], T], self.t)
+        return t(self.results.pop(0))
     
     def fetch_next(self):
         self.params["page"] = self.page + 1

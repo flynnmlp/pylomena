@@ -5,9 +5,9 @@ import unittest
 import pylomena
 
 
-class TestDerpibooru(unittest.TestCase):
+class TestApi(unittest.TestCase):
     def setUp(self) -> None:
-        self.derpibooru = pylomena.Site("https://derpibooru.org")
+        self.derpibooru = pylomena.Site(pylomena.KNOWN_SITES["derpibooru"])
     
     def tearDown(self) -> None:
         pass

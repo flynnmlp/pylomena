@@ -9,5 +9,5 @@ tests = list(map(str, pathlib.Path("tests").glob("*.py")))
 if not tests:
     raise ValueError("No tests found!")
 
-subprocess.check_call((sys.executable, "-m", "unittest", *tests))
+sys.exit(subprocess.call((sys.executable, "-m", "unittest", *tests)))
 

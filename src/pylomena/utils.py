@@ -16,7 +16,7 @@ class JSONClass(abc.ABC):
         try:
             t = clz.__annotations__[key]
         except KeyError:
-            raise AttributeError(f"{get_class_name(clz)!r} object has no attribute {key!r}")
+            return key, value
         
         if t == List:
             inner_t = t.__args__[0]
