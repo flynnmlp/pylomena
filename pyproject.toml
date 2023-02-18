@@ -28,12 +28,12 @@ all = [
 ]
 
 testing = [
-  "flake8~=6.0.0",
+  "flake8>=5.0.4",
   "Flake8-pyproject~=1.2.2",
   "mypy~=1.0.1",
   "types-python-dateutil~=2.8.19.6",
   "types-requests~=2.28.11.12",
-  "tox~=4.4.5",
+  "tox",
 ]
 
 [project.urls]
@@ -67,10 +67,9 @@ isolated_build = True
 [testenv]
 setenv =
   PYTHONPATH = {toxinidir}
-allowlist_externals=./test.sh
 deps = .[testing]
 commands =
-  ./test.sh
+  {envpython} test.py
   mypy src tests
 
 [testenv:flake8]
