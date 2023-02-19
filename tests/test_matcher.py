@@ -124,6 +124,31 @@ class TestMatcher(unittest.TestCase):
             self.assertNonMatch("created_at.lt:1 year ago")
         finally:
             self.img.created_at = origdate
+    
+    def test_interactions(self):
+        data: Sequence[pylomena.JSONObject] = [
+            {
+                "image_id": 0,
+                "interaction_type": "faved",
+                "user_id": 0,
+                "value": ""
+            },
+            {
+                "image_id": 0,
+                "interaction_type": "voted",
+                "user_id": 0,
+                "value": "up"
+            }
+        ]
+        
+        interactions: Interactions = [pylomena.Interaction(i) for i in data]
+        
+        self.assertMatch("my:faves", interactions)
+        self.assertNonMatch("my:faves", [])
+        self.assertMatch("my:upvotes", interactions)
+        self.assertNonMatch("my:upvotes", [])
+        
+        self.assertNonMatch("my:downvotes", interactions)
 
 
 if __name__ == '__main__':
