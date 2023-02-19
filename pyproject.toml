@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pylomena"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
   { name="Flynn", email="flynnmlp@gmail.com" },
 ]
@@ -69,7 +69,7 @@ setenv =
   PYTHONPATH = {toxinidir}
 deps = .[testing]
 commands =
-  {envpython} test.py
+  {envpython} tests/test_main.py
   mypy src tests
 
 [testenv:flake8]
