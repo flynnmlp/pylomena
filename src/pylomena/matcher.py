@@ -5,6 +5,7 @@ Ported from https://github.com/philomena-dev/philomena/blob/master/assets/js/mat
 """
 
 import abc
+import dateutil.parser
 import re
 import Levenshtein
 import math
@@ -135,8 +136,11 @@ class SearchTerm(SearchOperand):
             re.compile(r"^:(\d{2})"),
         ]
         
+        if not date_val:
+            raise ParseError("Empty term")
+        
         timezone_offset = [0, 0]
-        time_data = [0, 0, 1, 0, 0, 0]
+        time_data = [0, 1, 1, 0, 0, 0]
         orig_date_val = date_val
         local_date_val = date_val
         
@@ -155,6 +159,7 @@ class SearchTerm(SearchOperand):
         
         for i, regex in enumerate(PARSE_RES):
             if not local_date_val:
+                i -= 1
                 break
             
             match = regex.match(local_date_val)
@@ -350,7 +355,7 @@ class SearchTerm(SearchOperand):
             return False
         
         if self.term_type == "date":
-            date = datetime.fromisoformat(getattr(target, self.term_space))
+            date = dateutil.parser.isoparse(getattr(target, self.term_space))
             # The open-left, closed-right date range specified by the
             # date/time format limits the types of comparisons that are
             # done compared to numeric ranges.
