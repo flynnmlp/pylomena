@@ -17,7 +17,7 @@ class Site:
         self.base_url = base_url
         self.api_base = urllib.parse.urljoin(self.base_url, "/api/v1/json/")
     
-    def api_call(self, method: str, *args, **kwargs) -> requests.Response:
+    def api_call(self, method: str, *args: Any, **kwargs: Any) -> requests.Response:
         """
         perform a GET API call to the endpoint `method`.
         all other arguments are passed down to requests.get()
@@ -30,10 +30,10 @@ class Site:
         self,
         method: str,
         slug: str,
-        *args,
+        *args: Any,
         params: Dict[str, Any] = {},
         t: Optional[Callable] = None,
-        **kwargs
+        **kwargs: Any
     ) -> "PaginatedResult[T]":
         """
         get a full list that will be returned in parts
@@ -192,10 +192,10 @@ class PaginatedResult(Iterator[T], Generic[T]):
         site: Site,
         method: str,
         slug: str,
-        *args,
+        *args: Any,
         params: Dict[str, Any] = {},
         t: Optional[Callable],
-        **kwargs,
+        **kwargs: Any,
     ):
         self.site = site
         self.method = method
@@ -221,7 +221,7 @@ class PaginatedResult(Iterator[T], Generic[T]):
         t = cast(Callable[[JSONData], T], self.t)
         return t(self.results.pop(0))
     
-    def fetch_next(self):
+    def fetch_next(self) -> None:
         self.params["page"] = self.page + 1
         
         pause = 2

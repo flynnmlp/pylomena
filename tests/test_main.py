@@ -5,7 +5,7 @@ import subprocess
 import sys
 
 
-def main():
+def main() -> None:
     this = pathlib.Path(__file__).name
     
     tests = [

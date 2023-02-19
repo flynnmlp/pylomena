@@ -77,13 +77,13 @@ class TestMatcher(unittest.TestCase):
         self.assertMatch("faves.gt:1")
         self.assertMatch("tag_count.gt:1")
     
-    def test_fuzzy(self):
+    def test_fuzzy(self) -> None:
         self.assertMatch("derpy hovet~2.0")
         self.assertNonMatch("derpy hovet~1.0")
         self.assertMatch("derppyy hovet~4.0")
         self.assertNonMatch("derppyy hovet~3.0")
     
-    def test_dates_abs(self):
+    def test_dates_abs(self) -> None:
         self.assertMatch("created_at:2012")
         self.assertMatch("created_at:2012-01")
         self.assertMatch("created_at:2012-01-02")
@@ -96,7 +96,7 @@ class TestMatcher(unittest.TestCase):
         self.assertMatch("created_at.lt:2012-02")
         self.assertMatch("created_at.lt:2013")
     
-    def test_dates_rel(self):
+    def test_dates_rel(self) -> None:
         now = datetime.datetime.now().astimezone(tz=datetime.timezone.utc)
         date = now - datetime.timedelta(hours=1, minutes=30)
         datestr = date.strftime("%Y-%m-%dT%H:%M:%MZ")
@@ -125,7 +125,7 @@ class TestMatcher(unittest.TestCase):
         finally:
             self.img.created_at = origdate
     
-    def test_interactions(self):
+    def test_interactions(self) -> None:
         data: Sequence[pylomena.JSONObject] = [
             {
                 "image_id": 0,

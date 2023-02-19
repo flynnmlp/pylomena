@@ -313,7 +313,7 @@ class SearchTerm(SearchOperand):
         type: str,
         interaction: Optional[str],
         interactions: Sequence[Interaction],
-    ):
+    ) -> bool:
         return any(
             v.image_id == image_id and v.interaction_type == type and (interaction is None or v.value == interaction)
             for v in interactions
@@ -425,7 +425,7 @@ class OrOperator(SearchOperand):
         return self.op1.match(target, interactions) or self.op2.match(target, interactions)
 
 
-def generate_lex_array(search_str) -> List[Union[SearchTerm, str]]:
+def generate_lex_array(search_str: str) -> List[Union[SearchTerm, str]]:
     op_queue: List[str] = []
     group_negate: List[bool] = []
     token_stack: List[Union[SearchTerm, str]] = []
