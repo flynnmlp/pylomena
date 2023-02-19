@@ -98,10 +98,8 @@ class TestMatcher(unittest.TestCase):
     
     def test_dates_rel(self):
         now = datetime.datetime.now().astimezone(tz=datetime.timezone.utc)
-        
         date = now - datetime.timedelta(hours=1, minutes=30)
-        
-        datestr = date.strftime("%Y-%m-%dT%H:%H:%MZ")
+        datestr = date.strftime("%Y-%m-%dT%H:%M:%MZ")
         
         origdate = self.img.created_at
         try:
