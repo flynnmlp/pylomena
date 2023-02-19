@@ -6,6 +6,7 @@ Ported from https://github.com/philomena-dev/philomena/blob/master/assets/js/mat
 
 import abc
 import re
+import Levenshtein
 import math
 import time
 
@@ -285,32 +286,9 @@ class SearchTerm(SearchOperand):
         else:
             target_distance = 0
         
-        target_str_lower = target_str.lower()
+        distance = Levenshtein.distance(self.term, target_str.lower())
         
-        # Work vectors, representing the last three populated
-        # rows of the dynamic programming matrix of the iterative
-        # optimal string alignment calculation.
-        v0: List[int] = []
-        v1: List[int] = list(range(len(target_str_lower) + 1))
-        v2: List[int] = []
-        
-        for i, term_c in enumerate(self.term):
-            v2[0] = i
-            for j, target_c in enumerate(target_str_lower):
-                cost = 0 if term_c == target_c else 1
-                v2[j + 1] = min(
-                    v1[j + 1] + 1,  # deletion
-                    v2[j] + 1,      # insertion
-                    v1[j] + cost,
-                )
-                if i > 1 and j > 1 and term_c == target_str_lower[j - 1] and \
-                        target_str_lower[i - 1] == target_c:
-                    v2[j + 1] = min(v2[j], v0[j - 1] + cost)
-            
-            # Rotate dem vec pointers bra.
-            v0, v1, v2 = v1, v2, v0
-        
-        return v1[len(target_str_lower)] < target_distance
+        return distance <= target_distance
     
     def exact_match(self, target_str: str) -> bool:
         if not isinstance(self.term, str):
