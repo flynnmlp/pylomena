@@ -13,7 +13,7 @@ import time
 
 from datetime import datetime, timezone, timedelta
 from dateutil.relativedelta import relativedelta
-from typing import cast, Callable, List, Optional, Sequence, Tuple, Union
+from typing import cast, Callable, Iterable, List, Optional, Sequence, Tuple, Union
 
 from . import api, utils
 from .types import Image, Interaction
@@ -590,7 +590,7 @@ def parse_search(search: str) -> SearchOperand:
     return parse_tokens(generate_lex_array(search))
 
 
-def main():
+def main() -> None:
     import argparse
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group(required=True)
@@ -599,6 +599,8 @@ def main():
     parser.add_argument("-t", "--test", action="store", required=True, help="Term to test")
     
     args = parser.parse_args()
+    
+    images: Iterable[Image]
     
     site = api.Site("https://derpibooru.org/")
     if args.query:
